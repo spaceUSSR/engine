@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "Renderer/ShaderProgramm.h"
 
 int windowWidth = 640;
 int windowHeight = 480;
@@ -34,6 +35,8 @@ void glfwWindowKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int actio
 
 int main(void)
 {
+
+
     if (!glfwInit())
     {
         std::cout<< "glfwInit() error!" << std::endl;
@@ -70,23 +73,15 @@ int main(void)
 
     glClearColor(0.5f, 0.5f, 0.5f, 1);
 
-    GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertShader, 1, &vertex_shader, nullptr);
-    glCompileShader(vertShader);
+    std::string vertexShader(vertex_shader);
+    std::string fragmentShader(fragment_shader);
 
-
-
-    GLuint fragmShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmShader, 1, &fragment_shader, nullptr);
-    glCompileShader(fragmShader);
-
-    GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertShader);
-    glAttachShader(shader_program, fragmShader);
-    glLinkProgram(shader_program);
-
-    glDeleteShader(vertShader);
-    glDeleteShader(fragmShader);
+    Renderer::ShaderProgramm shaderProgramm(vertexShader, fragmentShader);
+    if(!shaderProgramm.isCompiled())
+    {
+        std::cerr<<"Shader is't compiled!" << std::endl;
+        return -1;
+    }
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);
@@ -116,7 +111,7 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader_program);
+        shaderProgramm.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         /* Swap front and back buffers */
