@@ -2,9 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Renderer/ShaderProgramm.h"
-
-int windowWidth = 640;
-int windowHeight = 480;
+#include "mainwindow.h"
 
 GLfloat point[] = {  0.0f,   0.5f,  0.0f,
                      0.5f,  -0.5f,  0.0f,
@@ -30,52 +28,21 @@ const char* fragment_shader = "#version 460\n"
 "   fragment_color = vec4(color, 1.0);"
 "}";
 
-void glfwWindowSizeCallBack(GLFWwindow* pWindow, int width, int height);
-void glfwWindowKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int action, int mods);
-
 int main(void)
 {
-
-
-    if (!glfwInit())
+    std::string windowTitle("engine");
+    MainWindow window(windowTitle);
+    if(!window.isCreated())
     {
-        std::cout<< "glfwInit() error!" << std::endl;
+        std::cerr<< "Window is't created" << std::endl;
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    window.ClearColor(0.5f, 0.5f, 0.5f);
 
-    /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* pWindow;
-    pWindow = glfwCreateWindow(windowWidth, windowHeight, "Hello World", nullptr, nullptr);
-    if (!pWindow)
-    {
-        glfwTerminate();
-        return -2;
-    }
-
-    glfwSetWindowSizeCallback(pWindow, glfwWindowSizeCallBack);
-    glfwSetKeyCallback(pWindow, glfwWindowKeyCallBack);
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(pWindow);
-
-    if(!gladLoadGL())
-    {
-        std::cout<< "gladLoadGL() error!" << std::endl;
-        return -3;
-    }
-
-    std::cout<< "Renderer " << glGetString(GL_RENDERER) << std::endl;
-    std::cout<< "Version "  << glGetString(GL_VERSION)  << std::endl;
-
-    glClearColor(0.5f, 0.5f, 0.5f, 1);
 
     std::string vertexShader(vertex_shader);
     std::string fragmentShader(fragment_shader);
-
     Renderer::ShaderProgramm shaderProgramm(vertexShader, fragmentShader);
     if(!shaderProgramm.isCompiled())
     {
@@ -106,40 +73,16 @@ int main(void)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(pWindow))
+    while (!glfwWindowShouldClose(window.getWindow()))
     {
-        /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderProgramm.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        /* Swap front and back buffers */
-        glfwSwapBuffers(pWindow);
 
-        /* Poll for and process events */
+        glfwSwapBuffers(window.getWindow());
         glfwPollEvents();
     }
-    glfwDestroyWindow(pWindow);
-    glfwTerminate();
     return 0;
-}
-
-
-
-void glfwWindowSizeCallBack(GLFWwindow* pWindow, int width, int height)
-{
-    (void)pWindow;
-    windowHeight = height;
-    windowWidth = width;
-    glViewport(0, 0, width, height);
-    return;
-}
-
-void glfwWindowKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
-{
-    (void)scancode;
-    (void)mods;
-    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
 }
