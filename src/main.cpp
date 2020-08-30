@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "Renderer/ShaderProgramm.h"
+#include "Renderer/ShaderProgram.h"
 #include "mainwindow.h"
 
 GLfloat point[] = {  0.0f,   0.5f,  0.0f,
@@ -43,8 +43,8 @@ int main(void)
 
     std::string vertexShader(vertex_shader);
     std::string fragmentShader(fragment_shader);
-    Renderer::ShaderProgramm shaderProgramm(vertexShader, fragmentShader);
-    if(!shaderProgramm.isCompiled())
+    Renderer::ShaderProgram shaderProgram(vertexShader, fragmentShader);
+    if(!shaderProgram.isCompiled())
     {
         std::cerr<<"Shader is't compiled!" << std::endl;
         return -1;
@@ -77,7 +77,7 @@ int main(void)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shaderProgramm.use();
+        shaderProgram.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
