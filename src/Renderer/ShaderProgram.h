@@ -1,33 +1,28 @@
-#pragma once
+#ifndef SHADERPROGRAM_H_
+#define SHADERPROGRAM_H_
 
 #include <string>
-#include <iostream>
+
+typedef unsigned int uint;
+typedef unsigned int GLenum;
 
 namespace Renderer {
-typedef unsigned int GLuint;
-
 class ShaderProgram{
 public:
-    ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader);
-    ShaderProgram() = delete;
-    ShaderProgram(ShaderProgram&) = delete;
-    ShaderProgram(ShaderProgram&& shaderProgram) noexcept;
+    ShaderProgram(const std::string &vShaderPath, const std::string &fShaderPath);
     ~ShaderProgram();
 
+    void setInt(const std::string& uniform, int data) const;
+    void setData(const std::string& uniform, float data) const;
 
-    ShaderProgram& operator = (const ShaderProgram&) = delete;
-    ShaderProgram& operator = (ShaderProgram&& shaderProgram) noexcept;
-
-     bool isCompiled();
-     void use() const;
+    void useShaderProgram() const;
+    int getUniformLocation(const std::string& uniform) const;
 private:
-    bool createShader(const std::string& source, GLenum shaderType, GLuint& shaderID);
+    uint m_shaderProgram;
 
-
-    bool m_isCompiled = false;
-    GLuint m_ID = 0;
-
+    bool createShader(uint& shader, GLenum shaderType, const char* shaderSource);
+    std::string shaderSource(const std::string& shaderSourcePath) const;
+};
 };
 
-
-};
+#endif

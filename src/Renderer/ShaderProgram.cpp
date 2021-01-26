@@ -1,101 +1,116 @@
 #include <glad/glad.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include "ShaderProgram.h"
-
-namespace Renderer {
-
-bool ShaderProgram::isCompiled()
+namespace Renderer
 {
-    return this->m_isCompiled;
-}
 
-ShaderProgram::ShaderProgram(const std::string& vertexShader, const std::string& fragmentShader)
+ShaderProgram::ShaderProgram(const std::string &vShaderPath, const std::string &fShaderPath)
 {
-    GLuint vertexShaderID;
-    if(!createShader(vertexShader, GL_VERTEX_SHADER, vertexShaderID))
+
+    std::string vShaderSource = shaderSource(vShaderPath);
+    std::string fShaderSource = shaderSource(fShaderPath);
+
+    /* Compile shaders */
+    uint vertexShader, fragmentShader;
+    if(!createShader(vertexShader, GL_VERTEX_SHADER, vShaderSource.c_str()))
     {
-        std::cerr << "Vertex shader compile error!" << std::endl;
+        return;
+    }
+    if(!createShader(fragmentShader, GL_FRAGMENT_SHADER, fShaderSource.c_str()))
+    {
+        glDeleteShader(vertexShader);
         return;
     }
 
-    GLuint fragmentShaderID;
-    if(!createShader(fragmentShader, GL_FRAGMENT_SHADER, fragmentShaderID))
+     /* Create and link shader program */
+    m_shaderProgram = glCreateProgram();
+    glAttachShader(m_shaderProgram, vertexShader);
+    glAttachShader(m_shaderProgram, fragmentShader);
+    glLinkProgram(m_shaderProgram);
+
+    /* Get result shader program linking */
+    GLint seccess;
+    glGetShaderiv(m_shaderProgram, GL_LINK_STATUS, &seccess);
+    if(seccess)
     {
-        glDeleteShader(vertexShaderID);
-        std::cerr << "Fragment shader compile error!" << std::endl;
-        return;
-    }
 
-
-    m_ID = glCreateProgram();
-    glAttachShader(m_ID, vertexShaderID);
-    glAttachShader(m_ID, fragmentShaderID);
-    glLinkProgram(m_ID);
-
-
-    GLint result;
-    glGetProgramiv(m_ID, GL_LINK_STATUS, &result);
-    if(!result)
-    {
-        GLchar infoLog[1024];
-        glGetShaderInfoLog(m_ID, sizeof (infoLog), nullptr, infoLog);
-        std::cerr << "ERROR::SHADER link-time error!" << infoLog << std::endl;
     }
     else
     {
-        m_isCompiled = true;
+        char infoLog[1024];
+        glGetProgramInfoLog(m_shaderProgram, sizeof (infoLog), NULL, infoLog);
+        std::cout<< infoLog << std::endl;
     }
 
-    glDeleteShader(vertexShaderID);
-    glDeleteShader(fragmentShaderID);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 }
 
-
-bool ShaderProgram::createShader(const std::string& source, GLenum shaderType, GLuint& shaderID)
+void ShaderProgram::useShaderProgram() const
 {
-    const GLchar* sourceCode = source.c_str();
+    glUseProgram(m_shaderProgram);
+}
 
-    shaderID = glCreateShader(shaderType);
-    glShaderSource(shaderID, 1, &sourceCode, nullptr);
-    glCompileShader(shaderID);
+int ShaderProgram::getUniformLocation(const std::string &uniform) const
+{
+    return glGetUniformLocation(m_shaderProgram, uniform.c_str());
+}
 
-    GLint result;
-    glGetShaderiv(shaderID, shaderType, &result);
-    if(!result)
+bool ShaderProgram::createShader(uint &shader, GLenum shaderType, const char *shaderSource)
+{
+    shader = glCreateShader(shaderType);
+    glShaderSource(shader, 1, &shaderSource, nullptr);
+    glCompileShader(shader);
+
+    GLint seccess;
+    glGetShaderiv(m_shaderProgram, GL_COMPILE_STATUS, &seccess);
+    if(!seccess)
     {
-        GLchar infoLog[1024];
-        glGetShaderInfoLog(shaderID, sizeof (infoLog), nullptr, infoLog);
-        std::cerr << "ERROR::SHADER compile-time error!" << infoLog << std::endl;
+        char infoLog[1024];
+        glGetShaderInfoLog(m_shaderProgram, sizeof (infoLog), NULL, infoLog);
+        std::cout<< infoLog << std::endl;
         return false;
     }
     return true;
-
 }
-void ShaderProgram::use() const
+
+std::string ShaderProgram::shaderSource(const std::string &sourcePath) const
 {
-    glUseProgram(m_ID);
+    std::string soureCode;
+    std::ifstream shaderFile;
+    shaderFile.exceptions(std::ifstream::badbit);
+    try
+    {
+        shaderFile.open(sourcePath);
+        std::stringstream shaderStream;
+
+        shaderStream << shaderFile.rdbuf();
+        shaderFile.close();
+
+        soureCode = shaderStream.str();
+
+    }  catch (std::ifstream::failure& e)
+    {
+        std::cout << "Get shader source error!"<< std::endl << e.what() << std::endl;
+    }
+    return soureCode;
 }
 
 ShaderProgram::~ShaderProgram()
 {
-    glDeleteProgram(m_ID);
+    glDeleteProgram(m_shaderProgram);
 }
-ShaderProgram::ShaderProgram(ShaderProgram&& shaderProgramm) noexcept
+
+void ShaderProgram::setInt(const std::string &uniform, int data) const
 {
-    this->m_ID = shaderProgramm.m_ID;
-    this->m_isCompiled = shaderProgramm.m_isCompiled;
-
-    shaderProgramm.m_isCompiled = false;
-    shaderProgramm.m_ID = 0;
+    glUniform1i(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
 }
-ShaderProgram& ShaderProgram::operator = (ShaderProgram&& shaderProgramm) noexcept
+
+void ShaderProgram::setData(const std::string &uniform, float data) const
 {
-    glDeleteProgram(this->m_ID);
-    this->m_ID = shaderProgramm.m_ID;
-    this->m_isCompiled = shaderProgramm.m_isCompiled;
-
-    shaderProgramm.m_isCompiled = false;
-    shaderProgramm.m_ID = 0;
-    return *this;
+    glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
 }
-};
 
+}

@@ -1,88 +1,131 @@
+#include <iostream>
+#include "window.h"
+#include "Renderer/ShaderProgram.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include "Renderer/ShaderProgram.h"
-#include "mainwindow.h"
+#include <time.h>
+#include <cmath>
+#include <stb_image.h>
 
-GLfloat point[] = {  0.0f,   0.5f,  0.0f,
-                     0.5f,  -0.5f,  0.0f,
-                    -0.5f,  -0.5f,  0.0f};
-
-GLfloat color[] = { 1.0f, 0.0f, 0.0f,
-                    0.0f, 1.0f, 0.0f,
-                    0.0f, 0.0f, 1.0f};
-
-const char* vertex_shader = "#version 460\n"
-"layout(location = 0 ) in vec3 vector_pos;"
-"layout(location = 1 ) in vec3 vector_col;"
-"out vec3 color;"
-"void main(){"
-"   color = vector_col;"
-"   gl_Position = vec4(vector_pos, 1.0);"
-"}";
-
-const char* fragment_shader = "#version 460\n"
-"in vec3 color;"
-"out vec4 fragment_color;"
-"void main(){"
-"   fragment_color = vec4(color, 1.0);"
-"}";
 
 int main(void)
 {
-    std::string windowTitle("engine");
-    MainWindow window(windowTitle);
-    if(!window.isCreated())
+    Window::initialize(640, 480, "my window");
     {
-        std::cerr<< "Window is't created" << std::endl;
-        return -1;
-    }
+        Renderer::ShaderProgram shaderProgram("res/shaders/shader.glslv", "res/shaders/shader.glslf");
 
-    window.ClearColor(0.5f, 0.5f, 0.5f);
+        /* Create first object */
+                                /* Points         */    /* Colors         */    /* Texture*/
+        float vertices[] = {    -0.5f,  0.5f,   0.0f,   1.0f,   0.0f,   0.0f,   0.0f, 2.0f, // top left
+                                -0.5f,  -0.5f,  0.0f,   0.0f,   1.0f,   0.0f,   0.0f, 0.0f, // bottom left
+                                 0.5f,   0.5f,  0.0f,   0.0f,   0.0f,   1.0f,   2.0f, 2.0f, // top right
+                                 0.5f,  -0.5f,  0.0f,   1.0f,   1.0f,   0.0f,   2.0f, 0.0f}; // bottom right
+        uint indices[] = {0, 2, 3,
+                          0, 1, 3};
 
-
-    std::string vertexShader(vertex_shader);
-    std::string fragmentShader(fragment_shader);
-    Renderer::ShaderProgram shaderProgram(vertexShader, fragmentShader);
-    if(!shaderProgram.isCompiled())
-    {
-        std::cerr<<"Shader is't compiled!" << std::endl;
-        return -1;
-    }
-
-    GLuint points_vbo = 0;
-    glGenBuffers(1, &points_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof (point), point, GL_STATIC_DRAW);
-
-    GLuint colors_vbo = 0;
-    glGenBuffers(1, &colors_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof (color), color, GL_STATIC_DRAW);
-
-    GLuint vao = 0;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 0, nullptr);
-
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window.getWindow()))
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        shaderProgram.use();
+        uint vbo, vao;
+        glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glfwSwapBuffers(window.getWindow());
-        glfwPollEvents();
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof (float), (void*)(sizeof (float) * 3));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof (float), (void*)(sizeof (float) * 6));
+        glEnableVertexAttribArray(2);
+
+        uint ebo;
+        glGenBuffers(1, &ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof (indices), indices, GL_STATIC_DRAW);
+
+        /* Textures */
+        int width, height, nrChanel;
+        uint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char *data = stbi_load("res/textures/container.jpg", &width, &height, &nrChanel, 0);
+        if(data) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            stbi_image_free(data);
+        } else {
+            std::cout << "Texture load error!" << std::endl;
+        }
+
+        uint texture2;
+        glGenTextures(1, &texture2);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        data = stbi_load("res/textures/top_secret.png", &width, &height, &nrChanel, 0);
+        if(data) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            stbi_image_free(data);
+        } else {
+            std::cout << "Top secret texture load error!" << std::endl;
+        }
+
+//        uint location = shaderProgram.getUniformLocation("shift");
+        shaderProgram.useShaderProgram();
+        shaderProgram.setInt("texture2", 1);
+        float visibleStatus = 0;
+
+        /* Render cycle */
+        while(!Window::isSouldClose())
+        {
+            Window::clearColor(0.1f, 0.2f, 0.3f);
+
+            shaderProgram.useShaderProgram();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, texture2);
+
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
+            shaderProgram.setData("visibleStatus", visibleStatus);
+            if(Window::getKey(GLFW_KEY_UP) == GLFW_PRESS) {
+                visibleStatus+= 0.05;
+            } else if(Window::getKey(GLFW_KEY_DOWN) == GLFW_PRESS) {
+                visibleStatus-= 0.05;
+            }
+
+//            glUniform1f(location, 0.5);
+
+//            glDrawArrays(GL_TRIANGLES, 0, 6);
+
+            Window::swapBuffers();
+            Window::pollEvents();
+        }
+
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ebo);
     }
+    Window::finalize();
     return 0;
 }
