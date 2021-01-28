@@ -6,6 +6,8 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
+#include "events.h"
+
 struct GLFWwindow{};
 
 class Window
@@ -18,17 +20,24 @@ private:
 public:
     static int initialize(int w, int h, const char* title);
     static int finalize();
+
     static bool isSouldClose();
     static void swapBuffers();  // Swap front and back buffers
-    static void pollEvents();   // Poll for and process events
 
     static void clearColor(float r, float g, float b, float a = 1.0f);
 
     static int getKey(int key);
 
+    static int getHeight();
+    static void setHeight(int height);
+
+    static int getWidth();
+    static void setWidth(int width);
+
 private:
     static void glfwWindowSizeCallBack(GLFWwindow* pWindow, int width, int height);
-    static void glfwWindowKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int action, int mods);
+
+	friend class Events;
 };
 
 #endif //!WINDOW_H_

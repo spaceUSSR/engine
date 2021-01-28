@@ -1,4 +1,5 @@
 #include "window.h"
+#include "events.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -6,9 +7,34 @@ GLFWwindow* Window::m_window = 0;
 int Window::m_height = 480;
 int Window::m_width = 640;
 
+extern float yaw;
+extern float pitch;
+
+float lastX = 400, lastY = 300;
+
+int Window::getHeight()
+{
+    return m_height;
+}
+
+void Window::setHeight(int height)
+{
+    m_height = height;
+}
+
+int Window::getWidth()
+{
+    return m_width;
+}
+
+void Window::setWidth(int width)
+{
+    m_width = width;
+}
+
 int Window::initialize(int w, int h, const char* title)
 {
-
+    
     if (!glfwInit())
     {
         return 1;
@@ -27,7 +53,9 @@ int Window::initialize(int w, int h, const char* title)
     }
 
     glfwSetWindowSizeCallback(m_window, glfwWindowSizeCallBack);
-    glfwSetKeyCallback(m_window, glfwWindowKeyCallBack);
+	glfwSetKeyCallback(m_window, Events::keyCallBack);
+	glfwSetCursorPosCallback(m_window, Events::cursorPosCallBack);
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(m_window);
@@ -38,7 +66,7 @@ int Window::initialize(int w, int h, const char* title)
         glfwTerminate();
         return 3;
     }
-
+	Events::initialize();
     return 0;
 }
 
@@ -52,15 +80,11 @@ void Window::swapBuffers()
     glfwSwapBuffers(m_window);
 }
 
-void Window::pollEvents()
-{
-    glfwPollEvents();
-}
-
 void Window::clearColor(float r, float g, float b, float a)
 {
+    glEnable(GL_DEPTH_TEST);
     glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 int Window::getKey(int key)
@@ -70,6 +94,7 @@ int Window::getKey(int key)
 
 int Window::finalize()
 {
+	Events::finalize();
     glfwDestroyWindow(m_window);
     glfwTerminate();
     return 0;
@@ -81,20 +106,4 @@ void Window::glfwWindowSizeCallBack(GLFWwindow *pWindow, int width, int height)
     m_height = height;
     m_width = width;
     glViewport(0, 0, width, height);
-}
-
-void Window::glfwWindowKeyCallBack(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
-{
-    (void)scancode;
-    (void)mods;
-    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
-
-    if(key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    } else if(key == GLFW_KEY_LEFT_CONTROL && action == GLFW_RELEASE)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
 }

@@ -13,12 +13,12 @@ ShaderProgram::ShaderProgram(const std::string &vShaderPath, const std::string &
     std::string fShaderSource = shaderSource(fShaderPath);
 
     /* Compile shaders */
-    uint vertexShader, fragmentShader;
+	uint vertexShader, fragmentShader;
     if(!createShader(vertexShader, GL_VERTEX_SHADER, vShaderSource.c_str()))
     {
         return;
     }
-    if(!createShader(fragmentShader, GL_FRAGMENT_SHADER, fShaderSource.c_str()))
+	if(!createShader(fragmentShader, GL_FRAGMENT_SHADER, fShaderSource.c_str()))
     {
         glDeleteShader(vertexShader);
         return;
@@ -32,10 +32,10 @@ ShaderProgram::ShaderProgram(const std::string &vShaderPath, const std::string &
 
     /* Get result shader program linking */
     GLint seccess;
-    glGetShaderiv(m_shaderProgram, GL_LINK_STATUS, &seccess);
+	glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &seccess);
     if(seccess)
     {
-
+		compiled = true;
     }
     else
     {
@@ -58,6 +58,11 @@ int ShaderProgram::getUniformLocation(const std::string &uniform) const
     return glGetUniformLocation(m_shaderProgram, uniform.c_str());
 }
 
+bool ShaderProgram::isCompiled() const
+{
+	return compiled;
+}
+
 bool ShaderProgram::createShader(uint &shader, GLenum shaderType, const char *shaderSource)
 {
     shader = glCreateShader(shaderType);
@@ -68,10 +73,11 @@ bool ShaderProgram::createShader(uint &shader, GLenum shaderType, const char *sh
     glGetShaderiv(m_shaderProgram, GL_COMPILE_STATUS, &seccess);
     if(!seccess)
     {
-        char infoLog[1024];
+		char infoLog[520] = {0};
         glGetShaderInfoLog(m_shaderProgram, sizeof (infoLog), NULL, infoLog);
-        std::cout<< infoLog << std::endl;
-        return false;
+		std::cout<< "Error: " << ((shaderType == GL_FRAGMENT_SHADER)? "fragment shader " : " vertex shader ") << infoLog << std::endl;
+//		std::cout << shaderSource
+		return false;
     }
     return true;
 }
@@ -103,14 +109,24 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(m_shaderProgram);
 }
 
-void ShaderProgram::setInt(const std::string &uniform, int data) const
-{
-    glUniform1i(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
-}
+//void ShaderProgram::setInt(const std::string &uniform, int data) const
+//{
+//    glUniform1i(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
+//}
 
-void ShaderProgram::setData(const std::string &uniform, float data) const
-{
-    glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
-}
+//void ShaderProgram::setData(const std::string &uniform, float data) const
+//{
+//    glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
+//}
+
+//void ShaderProgram::setData(const std::string &uniform, const float *data, uint count, bool shouldTranspose)
+//{
+//	glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, uniform.c_str()), count, shouldTranspose, data);
+//}
+
+//void ShaderProgram::setData(const std::string &uniform, float x, float y, float z)
+//{
+//	glUniform3f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), x, y, z);
+//}
 
 }
