@@ -109,24 +109,24 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(m_shaderProgram);
 }
 
-//void ShaderProgram::setInt(const std::string &uniform, int data) const
-//{
-//    glUniform1i(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
-//}
+void ShaderProgram::setInt(const std::string &uniform, int data) const
+{
+	glUniform1i(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
+}
 
-//void ShaderProgram::setData(const std::string &uniform, float data) const
-//{
-//    glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
-//}
+void ShaderProgram::setData(const std::string &uniform, float data) const
+{
+	glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
+}
 
-//void ShaderProgram::setData(const std::string &uniform, const float *data, uint count, bool shouldTranspose)
-//{
-//	glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, uniform.c_str()), count, shouldTranspose, data);
-//}
+void ShaderProgram::setData(const std::string &uniform, const float *data, uint count, bool shouldTranspose)
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, uniform.c_str()), count, shouldTranspose, data);
+}
 
-//void ShaderProgram::setData(const std::string &uniform, float x, float y, float z)
-//{
-//	glUniform3f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), x, y, z);
-//}
+void ShaderProgram::setData(const std::string &uniform, float x, float y, float z)
+{
+	glUniform3f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), x, y, z);
+}
 
 }
