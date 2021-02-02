@@ -6,11 +6,7 @@
 GLFWwindow* Window::m_window = 0;
 int Window::m_height = 480;
 int Window::m_width = 640;
-
-extern float yaw;
-extern float pitch;
-
-float lastX = 400, lastY = 300;
+Events Window::m_events;
 
 int Window::getHeight()
 {
@@ -46,26 +42,25 @@ int Window::initialize(int w, int h, const char* title)
 
     /* Create a windowed mode window and its OpenGL context */
     m_window = glfwCreateWindow(w, h, title, nullptr, nullptr);
-    if (!m_window)
-    {
-        glfwTerminate();
-        return 2;
-    }
+	if (!m_window)
+	{
+		glfwTerminate();
+		return 2;
+	}
 
     glfwSetWindowSizeCallback(m_window, glfwWindowSizeCallBack);
-	glfwSetKeyCallback(m_window, Events::keyCallBack);
 	glfwSetCursorPosCallback(m_window, Events::cursorPosCallBack);
+	glfwSetKeyCallback(m_window, Events::keyCallBack);
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     /* Make the window's context current */
     glfwMakeContextCurrent(m_window);
-
-    if(!gladLoadGL())
-    {
-        glfwDestroyWindow(m_window);
-        glfwTerminate();
-        return 3;
-    }
+	if(!gladLoadGL())
+	{
+		glfwDestroyWindow(m_window);
+		glfwTerminate();
+		return 0;
+	}
 	Events::initialize();
     return 0;
 }

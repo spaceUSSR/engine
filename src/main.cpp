@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+			#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "window.h"
 #include "Renderer/ShaderProgram.h"
@@ -16,60 +16,51 @@ float pitch = 0.0f;
 
 int main(void)
 {
-	Window::initialize(1920, 1080, "my window");
+	Window::initialize(1920, 1080, "Engine");
 	{
-		Renderer::ShaderProgram lightShader("res/shaders/lightShader.glslv", "res/shaders/lightShader.glslf");
-		if(!lightShader.isCompiled())
-			std::cout << " lightShader isn't compiled" << std::endl;
+		float vertices[] = {		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+									0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+									0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+									0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+								   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
 
-		Renderer::ShaderProgram shaderProgram("res/shaders/shader.glslv", "res/shaders/shader.glslf");
+								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+								   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
 
-								/* Points         */    /* Texture*/
-		float vertices[] = { -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+								   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+								   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+								   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-									0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-									0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-									0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-								   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+									0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-									0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-									0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-									0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-								   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+									0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+									0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
 
-								   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-								   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-								   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+									0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+									0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+								   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
 
-									0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-									0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-									0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-									0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-									0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-									0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-									0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-									0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-									0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-								   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-								   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-									0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-									0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-									0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-								   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-								   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f};
-
-
-		//create vao1
+		/* Cube */
 		uint vbo, vao;
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -78,71 +69,83 @@ int main(void)
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
 
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof (float), (void*)(sizeof (float) * 3));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof (float), (void*)(sizeof (float) * 3));
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof (float), (void*)(sizeof (float) * 5));
 		glEnableVertexAttribArray(2);
 
+		/* Light cube */
 		uint lightVAO;
 		glGenVertexArrays(1, &lightVAO);
 		glBindVertexArray(lightVAO);
 		glBindBuffer(GL_VERTEX_ARRAY, vbo);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof (float), nullptr);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof (float), nullptr);
 		glEnableVertexAttribArray(0);
-
-
-		/* Textures */
-		Renderer::Texture cubeTexture("res/textures/container.jpg");
-		Renderer::Texture terrainTexture("res/textures/terrain.jpg");
-
 
 		float wHeight = static_cast<float>(Window::getHeight());
 		float wWidth = static_cast<float>(Window::getWidth());
-		glm::mat4 proejection = glm::perspective(glm::radians(45.0f), wHeight/wWidth, 0.1f, 100.0f);
+		glm::mat4 cubeModel = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f));
+		glm::mat4 proejection = glm::perspective(glm::radians(45.0f), wWidth/wHeight, 0.1f, 100.0f);
+
+		Renderer::ShaderProgram cubeShader("res/shaders/shader.vert", "res/shaders/shader.frag");
+		cubeShader.use();
+		cubeShader.setMat4("projection", proejection);
+		cubeShader.setData("lightColor", 1.0f, 1.0f, 1.0f);
+		cubeShader.setMat4("model", cubeModel);
+		cubeShader.setInt("material.ambient", 0);
+		cubeShader.setInt("material.specular", 1);
+		cubeShader.setInt("material.lines", 2);
 
 
-		shaderProgram.useShaderProgram();
-		shaderProgram.setData("projection", glm::value_ptr(proejection));
-		shaderProgram.setData("lightColor", 0.5f, 0.5f, 0.5f);
+		/* Material */
+		Renderer::Texture cubeTexture("res/textures/box.jpg");
+		Renderer::Texture cubeMapTexture("res/textures/box_map.jpg");
+		Renderer::Texture linesTexture("res/textures/lines.jpg");
+
+		cubeShader.setData("light.ambient" , 0.1f, 0.1f, 0.1f);
+		cubeShader.setData("light.diffuse" , 0.8f, 0.8f, 0.8f);
+		cubeShader.setData("light.specular" , 1.0f, 1.0f, 1.0f);
+		cubeShader.setData("material.shininess", 32.0f);
 
 
+		glm::mat4 lightCubeModel(1.0f);
+		glm::vec3 lightPos(1.0f, 1.0f, 1.0f);
+		lightCubeModel = glm::translate(lightCubeModel, lightPos);
+		lightCubeModel = glm::scale(lightCubeModel, glm::vec3(0.2f, 0.2f, 0.2f));
 
-		lightShader.useShaderProgram();
-		glm::mat4 lightCubeModel = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-		lightCubeModel = glm::scale(lightCubeModel, glm::vec3(0.4f, 0.4f, 0.4f));
-		lightShader.setData("projection", glm::value_ptr(proejection));
-		lightShader.setData("model", glm::value_ptr(lightCubeModel));
+		Renderer::ShaderProgram lightShader("res/shaders/lightShader.vert", "res/shaders/lightShader.frag");
+		lightShader.use();
+		lightShader.setMat4("projection", proejection);
+		lightShader.setMat4("model", lightCubeModel);
 
-
-		/* Render cycle */
 		while(!Window::isSouldClose())
 		{
-			Window::clearColor(0.1f, 0.2f, 0.3f);
+			Window::clearColor(0.1f, 0.1f, 0.1f);
 			glm::mat4 view = Camera::look();
 
-			/* Draw cubes*/
+
+			/* Draw cube*/
+			cubeShader.use();
+			cubeShader.setMat4("view", view);
+			cubeShader.setVec3("light.position", lightPos);
+			cubeShader.setVec3("viewPos", Camera::position());
+
 			cubeTexture.use(GL_TEXTURE0);
-
-			glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(0.4, 0.4f, 0.4f));
-			model = glm::rotate(model, static_cast<float>(glfwGetTime()), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			shaderProgram.useShaderProgram();
-			shaderProgram.setData("view", glm::value_ptr(view));
-			shaderProgram.setData("model", glm::value_ptr(model));
-
+			cubeMapTexture.use(GL_TEXTURE1);
+			linesTexture.use(GL_TEXTURE2);
 			glBindVertexArray(vao);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-
 			/* Draw light cube */
-			lightShader.useShaderProgram();
-			lightShader.setData("view", glm::value_ptr(view));
+			lightShader.use();
+			lightShader.setMat4("view", view);
 			glBindVertexArray(lightVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-
 
 			Window::swapBuffers();
 			Events::pollEvents();
@@ -151,7 +154,7 @@ int main(void)
 		glDeleteVertexArrays(1, &vao);
 		glDeleteVertexArrays(1, &lightVAO);
 		glDeleteBuffers(1, &vbo);
-    }
-    Window::finalize();
+	}
+	Window::finalize();
     return 0;
 }

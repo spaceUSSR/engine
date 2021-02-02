@@ -25,6 +25,14 @@ void Events::finalize()
 
 void Events::cursorPosCallBack(GLFWwindow *window, double xpos, double ypos)
 {
+	static bool first = true;
+	if(first)
+	{
+		xpos = 0.0f;
+		ypos = 0.0f;
+		first = false;
+	}
+
 	(void)window;
 	float xOffset = xpos - m_lastXpos;
 	float yOffset = ypos - m_lastYpos;
@@ -83,6 +91,5 @@ void Events::pollEvents()
 	if(m_key[GLFW_KEY_ESCAPE]) {
 		glfwSetWindowShouldClose(Window::m_window, true);
 	}
-	Camera::m_cameraPos.y = 0.0f;
 	glfwPollEvents();
 }

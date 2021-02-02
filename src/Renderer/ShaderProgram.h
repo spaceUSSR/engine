@@ -2,6 +2,7 @@
 #define SHADERPROGRAM_H_
 
 #include <string>
+#include <glm/glm.hpp>
 
 typedef unsigned int uint;
 typedef unsigned int GLenum;
@@ -14,10 +15,11 @@ public:
 
 	void setInt(const std::string& uniform, int data) const;
 	void setData(const std::string& uniform, float data) const;
-	void setData(const std::string& uniform, const float* data, uint count = 1, bool shouldTranspose = false);
-	void setData(const std::string& uniform, float x, float y, float z);
+	void setData(const std::string& uniform, float x, float y, float z) const;
+	void setVec3(const std::string& uniform, const glm::vec3& vec) const;
+	void setMat4(const std::string &uniform, const glm::mat4 &mat, uint count = 1, bool shouldTranspose = false) const;
 
-    void useShaderProgram() const;
+	void use() const;
     int getUniformLocation(const std::string& uniform) const;
 	bool isCompiled() const;
 

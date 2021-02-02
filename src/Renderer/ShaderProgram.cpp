@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <glm/gtc/type_ptr.hpp>
 #include "ShaderProgram.h"
 namespace Renderer
 {
@@ -48,7 +49,7 @@ ShaderProgram::ShaderProgram(const std::string &vShaderPath, const std::string &
     glDeleteShader(fragmentShader);
 }
 
-void ShaderProgram::useShaderProgram() const
+void ShaderProgram::use() const
 {
     glUseProgram(m_shaderProgram);
 }
@@ -70,13 +71,12 @@ bool ShaderProgram::createShader(uint &shader, GLenum shaderType, const char *sh
     glCompileShader(shader);
 
     GLint seccess;
-    glGetShaderiv(m_shaderProgram, GL_COMPILE_STATUS, &seccess);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &seccess);
     if(!seccess)
     {
-		char infoLog[520] = {0};
-        glGetShaderInfoLog(m_shaderProgram, sizeof (infoLog), NULL, infoLog);
+		char infoLog[1024];
+		glGetShaderInfoLog(shader, sizeof (infoLog), NULL, infoLog);
 		std::cout<< "Error: " << ((shaderType == GL_FRAGMENT_SHADER)? "fragment shader " : " vertex shader ") << infoLog << std::endl;
-//		std::cout << shaderSource
 		return false;
     }
     return true;
@@ -119,14 +119,19 @@ void ShaderProgram::setData(const std::string &uniform, float data) const
 	glUniform1f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), data);
 }
 
-void ShaderProgram::setData(const std::string &uniform, const float *data, uint count, bool shouldTranspose)
-{
-	glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, uniform.c_str()), count, shouldTranspose, data);
-}
-
-void ShaderProgram::setData(const std::string &uniform, float x, float y, float z)
+void ShaderProgram::setData(const std::string &uniform, float x, float y, float z) const
 {
 	glUniform3f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), x, y, z);
+}
+
+void ShaderProgram::setVec3(const std::string& uniform, const glm::vec3& vec) const
+{
+	glUniform3f(glGetUniformLocation(m_shaderProgram, uniform.c_str()), vec.x, vec.y, vec.z);
+}
+
+void ShaderProgram::setMat4(const std::string &uniform, const glm::mat4 &mat, uint count, bool shouldTranspose) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_shaderProgram, uniform.c_str()), count, shouldTranspose, glm::value_ptr(mat));
 }
 
 }

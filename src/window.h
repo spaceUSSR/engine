@@ -16,6 +16,7 @@ private:
     static GLFWwindow* m_window;
     static int m_height;
     static int m_width;
+	static Events m_events;
 
 public:
     static int initialize(int w, int h, const char* title);
