@@ -7,16 +7,16 @@ namespace Renderer {
 class Texture
 {
 	typedef unsigned int texture;
-	typedef texture TexNum;
 private:
+	uint m_id;
 	texture m_texture;
 
 
 public:
-	Texture(const std::string& texturePath);
+	Texture(const std::string& texturePath, uint m_id = 0);
 	~Texture();
 
-	void use(TexNum texNum);
+	void use();
 };
 
 }

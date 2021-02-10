@@ -22,6 +22,9 @@ add_executable(${PROJECT_NAME}
 
     src/camera.h
     src/camera.cpp
+
+    src/mesh.h
+    src/mesh.cpp
     )
 
 
@@ -46,6 +49,10 @@ target_link_libraries(${PROJECT_NAME} stb_image)
 # Lingk glm library
 add_subdirectory(external/glm)
 target_link_libraries(${PROJECT_NAME} glm)
+
+# Link assimp library
+#add_subdirectory(external/assimp-5.0.1)
+#target_link_libraries(${PROJECT_NAME} assimp)
 
 # Copy output file
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)

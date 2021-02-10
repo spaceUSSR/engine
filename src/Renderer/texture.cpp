@@ -4,7 +4,7 @@
 
 namespace Renderer {
 
-Texture::Texture(const std::string &texturePath)
+Texture::Texture(const std::string &texturePath, uint id) : m_id(id)
 {
 	glGenTextures(1, &m_texture);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
@@ -33,9 +33,9 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_texture);
 }
 
-void Texture::use(Texture::TexNum texNum)
+void Texture::use()
 {
-	glActiveTexture(texNum);
+	glActiveTexture(GL_TEXTURE0 + m_id);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 

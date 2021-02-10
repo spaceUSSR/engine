@@ -7,9 +7,15 @@ in vec3 fragPos;
 
 struct Light {
 	vec3 position;
+	vec3 direction;
+
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
 };
 
 
@@ -41,6 +47,12 @@ void main()
 	vec3 ambient = light.ambient		* texture(material.diffuse, texCord).rgb;
 	vec3 diffuse = light.diffuse		* diff * texture(material.diffuse, texCord).rgb;
 	vec3 specular = light.specular	* spec * texture(material.specular, texCord).rgb;
+
+	float distance = length(light.position - fragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
+	ambient*= attenuation;
+	diffuse*= attenuation;
+	specular*=attenuation;
 
 	vec3 result = ambient + diffuse + specular + texture(material.lines, texCord).rgb;
 	FragColor = vec4(result, 1.0);
