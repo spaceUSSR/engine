@@ -4,6 +4,7 @@
 
 namespace Renderer {
 
+typedef unsigned int uint;
 class Texture
 {
 	typedef unsigned int texture;

@@ -2,23 +2,26 @@
 #define CAMERA_H
 
 #include <glm/glm.hpp>
+
 class Camera
 {
-public:
-	static glm::mat4 look();
-	static glm::vec3 position();
-
 private:
-	static glm::vec3 m_cameraPos;
-	static glm::vec3 m_cameraFront;
-	static glm::vec3 m_cameraUp;
-	static float m_sensetivity;
-	static float m_speed;
+    glm::vec3 m_cameraPos;
+    glm::vec3 m_cameraFront;
+    glm::vec3 m_cameraUp;
 
-	static float m_yaw;
-	static float m_pitch;
+    float m_sensetivity;
+    float m_speed;
 
-	friend class Events;
+    float m_yaw;
+    float m_pitch;
+public:
+    Camera(float speed = 1.5f , float sensetivity = 1.7f);
+public:
+    ~Camera() {}
+public:
+    glm::mat4 look() const;
+    inline glm::vec3 getPosition() const {return m_cameraPos; }
 };
 
 #endif //CAMERA_H

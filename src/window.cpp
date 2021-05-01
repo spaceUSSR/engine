@@ -3,66 +3,29 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-GLFWwindow* Window::m_window = 0;
-int Window::m_height = 480;
-int Window::m_width = 640;
-Events Window::m_events;
-
-int Window::getHeight()
+Window::Window(const std::string &title, int width, int height) :
+    m_title(title), m_height(height), m_width(width)
 {
-    return m_height;
+    init();
 }
 
-void Window::setHeight(int height)
+Window::~Window()
 {
-    m_height = height;
+    glfwDestroyWindow(m_window);
+    glfwTerminate();
 }
 
-int Window::getWidth()
+void Window::init()
 {
-    return m_width;
-}
-
-void Window::setWidth(int width)
-{
-    m_width = width;
-}
-
-int Window::initialize(int w, int h, const char* title)
-{
-    
-    if (!glfwInit())
-    {
-        return 1;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    /* Create a windowed mode window and its OpenGL context */
-    m_window = glfwCreateWindow(w, h, title, nullptr, nullptr);
-	if (!m_window)
-	{
-		glfwTerminate();
-		return 2;
-	}
-
-    glfwSetWindowSizeCallback(m_window, glfwWindowSizeCallBack);
-	glfwSetCursorPosCallback(m_window, Events::cursorPosCallBack);
-	glfwSetKeyCallback(m_window, Events::keyCallBack);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    /* Make the window's context current */
+    if(!glfwInit())
+        return;
+    m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
+    if(!m_window)
+        return;
     glfwMakeContextCurrent(m_window);
-	if(!gladLoadGL())
-	{
-		glfwDestroyWindow(m_window);
-		glfwTerminate();
-		return 0;
-	}
-	Events::initialize();
-    return 0;
+
+    if(!gladLoadGL())
+        return;
 }
 
 bool Window::isSouldClose()
@@ -82,23 +45,16 @@ void Window::clearColor(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-int Window::getKey(int key)
+void Window::pollEvents()
 {
-    return glfwGetKey(m_window, key);
+    glfwPollEvents();
 }
 
-int Window::finalize()
-{
-	Events::finalize();
-    glfwDestroyWindow(m_window);
-    glfwTerminate();
-    return 0;
-}
 
-void Window::glfwWindowSizeCallBack(GLFWwindow *pWindow, int width, int height)
-{
-    (void)pWindow;
-    m_height = height;
-    m_width = width;
-    glViewport(0, 0, width, height);
-}
+//void Window::glfwWindowSizeCallBack(GLFWwindow *pWindow, int width, int height)
+//{
+////    (void)pWindow;
+////    m_height = height;
+////    m_width = width;
+////    glViewport(0, 0, width, height);
+//}

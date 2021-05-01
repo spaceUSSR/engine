@@ -6,39 +6,33 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
+#include <string>
 #include "events.h"
 
 struct GLFWwindow{};
 
-class Window
+class Window final
 {
 private:
-    static GLFWwindow* m_window;
-    static int m_height;
-    static int m_width;
-	static Events m_events;
-
-public:
-    static int initialize(int w, int h, const char* title);
-    static int finalize();
-
-    static bool isSouldClose();
-    static void swapBuffers();  // Swap front and back buffers
-
-    static void clearColor(float r, float g, float b, float a = 1.0f);
-
-    static int getKey(int key);
-
-    static int getHeight();
-    static void setHeight(int height);
-
-    static int getWidth();
-    static void setWidth(int width);
-
+    GLFWwindow* m_window;
+    std::string m_title;
+    int m_height, m_width;
 private:
-    static void glfwWindowSizeCallBack(GLFWwindow* pWindow, int width, int height);
-
-	friend class Events;
+    Window(const std::string& title, int width, int height);
+private:
+    ~Window();
+private:
+    void init();
+public:
+    static Window& getInstance() { static Window instance("My window", 1280, 720);
+                            return instance; }
+public:
+    bool isSouldClose();
+    void swapBuffers();
+    void clearColor(float r, float g, float b, float a = 1.0f);
+    void pollEvents();
+    inline int getHeight() const { return m_height; }
+    inline int getWidth() const { return m_width; }
 };
 
 #endif //!WINDOW_H_

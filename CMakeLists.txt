@@ -19,12 +19,11 @@ add_executable(${PROJECT_NAME}
 #events file
     src/events.h
     src/events.cpp
+    src/mouseevents.h
+    src/keyboardevent.h
 
     src/camera.h
     src/camera.cpp
-
-    src/mesh.h
-    src/mesh.cpp
     )
 
 
